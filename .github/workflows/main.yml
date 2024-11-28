@@ -1,0 +1,41 @@
+name: FastAPI CI/CD
+
+on:
+  push:
+    branches:
+      - main  # El pipeline se ejecutará cuando haya cambios en la rama `main`
+  pull_request:
+    branches:
+      - main  # También se ejecutará cuando se haga un pull request hacia la rama `main`
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # El pipeline se ejecuta en una máquina con Ubuntu
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2  # Este paso clona el código del repositorio
+
+      - name: Set up Python
+        uses: actions/setup-python@v2  # Este paso configura la versión de Python
+        with:
+          python-version: '3.x'  # Establece la versión de Python que necesitas
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt  # Instala las dependencias de tu proyecto FastAPI
+
+      - name: Run FastAPI locally (for testing)
+        run: |
+          uvicorn main:app --host 0.0.0.0 --port 8080  # Lanza el servidor FastAPI localmente para pruebas
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2  # Este paso sube los artefactos generados
+        with:
+          name: fastapi-artifacts  # Nombre del artefacto
+          path: ./  # Subir todo el directorio de trabajo, o especificar una carpeta con artefactos específicos
+
+      - name: Deploy to Azure
+        run: |
+          echo "Despliegue a Azure (este es un paso de ejemplo)"
+          # Aquí iría el comando para desplegar tu app a Azure, como usar Azure CLI o un servicio de Azure como App Service.
