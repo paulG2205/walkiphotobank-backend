@@ -1,46 +1,49 @@
-name: FastAPI CI/CD
+name: FastAPI CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main  # Esto se ejecutará cuando haya un push a la rama main
   pull_request:
     branches:
-      - main
+      - main  # Esto se ejecutará en cada PR dirigido a main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+    # Paso 1: Revisar el código
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Paso de depuración: Verificar el contenido del directorio
-      - name: List directory contents
-        run: |
-          ls -la  # Lista los archivos del directorio
-          cat main.py  # Muestra el contenido de main.py (si existe)
+    # Paso 2: Configurar Python 3.10
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
 
-      # Configura Python
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
+    # Paso 3: Instalar dependencias
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      # Instalar dependencias
-      - name: Install dependencies
-        run: |
-          pip install --no-cache-dir -r requirements.txt
+    # Paso 4: Ejecutar pruebas (si tienes pruebas, de lo contrario puedes saltar este paso)
+    - name: Run tests
+      run: |
+        pytest  # Cambia esto si usas otro marco de pruebas o si no tienes pruebas
 
-      # Ejecutar FastAPI con uvicorn
-      - name: Run FastAPI
-        run: |
-          uvicorn main:app --host 0.0.0.0 --port 8080  # Cambia 'main' si tu archivo es diferente
+    # Paso 5: Ejecutar el servidor FastAPI para pruebas
+    - name: Run FastAPI server locally
+      run: |
+        nohup uvicorn app.main:app --host 0.0.0.0 --port 8080 &  # Ejecuta el servidor en segundo plano
 
-      # Subir artefactos si es necesario
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: fastapi-artifacts
-          path: ./  # Ruta de artefactos generados
+    # Paso 6: Publicar artefactos para despliegue
+    - name: Publish artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: fastapi-artifacts
+        path: .  # Publica el directorio actual como artefacto
+
+    # Aquí puedes agregar pasos adicionales si deseas realizar un despliegue
