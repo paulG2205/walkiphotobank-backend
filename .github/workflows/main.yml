@@ -16,23 +16,31 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
+      # Paso de depuración: Verificar el contenido del directorio
+      - name: List directory contents
+        run: |
+          ls -la  # Lista los archivos del directorio
+          cat main.py  # Muestra el contenido de main.py (si existe)
+
+      # Configura Python
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
+      # Instalar dependencias
       - name: Install dependencies
         run: |
-          ls -la  # Verificar los archivos del repositorio
-          cat requirements.txt  # Asegurarse de que el archivo esté presente
-          pip install -r requirements.txt
+          pip install --no-cache-dir -r requirements.txt
 
-      - name: Run FastAPI locally (for testing)
+      # Ejecutar FastAPI con uvicorn
+      - name: Run FastAPI
         run: |
-          uvicorn main:app --host 0.0.0.0 --port 8080
+          uvicorn main:app --host 0.0.0.0 --port 8080  # Cambia 'main' si tu archivo es diferente
 
+      # Subir artefactos si es necesario
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: fastapi-artifacts
-          path: ./  # Ruta a los artefactos generados
+          path: ./  # Ruta de artefactos generados
