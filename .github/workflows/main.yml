@@ -19,19 +19,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
+          ls -la  # Verificar los archivos del repositorio
+          cat requirements.txt  # Asegurarse de que el archivo esté presente
           pip install -r requirements.txt
 
       - name: Run FastAPI locally (for testing)
         run: |
           uvicorn main:app --host 0.0.0.0 --port 8080
 
-      # Subir artefactos con la versión v3 de upload-artifact
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3  # Usar la versión correcta
+        uses: actions/upload-artifact@v3
         with:
           name: fastapi-artifacts
           path: ./  # Ruta a los artefactos generados
