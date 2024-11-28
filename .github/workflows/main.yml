@@ -3,32 +3,43 @@ name: FastAPI CI/CD
 on:
   push:
     branches:
-      - main  # Este pipeline se ejecuta cuando haya un push en la rama main
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Utiliza la última versión de Ubuntu como ambiente de ejecución
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v2  # Revisa el código del repositorio en la VM de GitHub Actions
+      - name: Check out repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.10  # Asegúrate de que la versión sea 3.10 y no 3.1
+      - name: Verify Python version
+        run: python --version
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Instala las dependencias del proyecto
+      - name: List directory contents
+        run: |
+          ls -la
+          cat requirements.txt  # Verifica si el archivo existe y tiene el contenido correcto
 
-    - name: Run tests
-      run: |
-        pytest  # Ejecuta los tests (asegúrate de que pytest esté instalado en tu requirements.txt)
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
 
-    - name: Publish artifacts
-      uses: actions/upload-artifact@v3  # Publica el artefacto con la versión correcta de upload-artifact
-      with:
-        name: fastapi-artifacts
-        path: .  # Publica el directorio actual como artefacto
+      - name: Install dependencies
+        run: |
+          pip install --no-cache-dir -r requirements.txt
+
+      - name: Run FastAPI locally (for testing)
+        run: |
+          ls -la  # Asegurarte de que los archivos están presentes
+          uvicorn main:app --host 0.0.0.0 --port 8080
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: fastapi-artifacts
+          path: ./  # Ruta a los artefactos generados
