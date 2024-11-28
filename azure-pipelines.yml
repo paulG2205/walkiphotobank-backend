@@ -7,16 +7,11 @@ pool:
 steps:
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.x'  # Choose the appropriate Python version
+    versionSpec: '3.10'  # Choose the appropriate Python version
     addToPath: true
 
-- task: InstallPythonDependencies@0
-  inputs:
-    packageType: 'pip'
-    requirementsFile: 'requirements.txt'  # Path to your requirements file
-
 - script: |
-    pip install -r requirements.txt
+    pip install -r requirements.txt  # Install dependencies from requirements.txt
   displayName: 'Install Dependencies'
 
 - script: |
