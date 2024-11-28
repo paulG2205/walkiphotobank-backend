@@ -1,49 +1,31 @@
-name: FastAPI CI/CD Pipeline
+name: FastAPI CI/CD
 
 on:
   push:
     branches:
-      - main  # Esto se ejecutará cuando haya un push a la rama main
-  pull_request:
-    branches:
-      - main  # Esto se ejecutará en cada PR dirigido a main
+      - main  # Este pipeline se ejecuta cuando haya un push en la rama main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Utiliza la última versión de Ubuntu como ambiente de ejecución
 
     steps:
-    # Paso 1: Revisar el código
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: Check out repository
+      uses: actions/checkout@v2  # Revisa el código del repositorio en la VM de GitHub Actions
 
-    # Paso 2: Configurar Python 3.10
     - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: 3.10  # Instala Python 3.10 en el entorno
 
-    # Paso 3: Instalar dependencias
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r requirements.txt  # Instala las dependencias del proyecto
 
-    # Paso 4: Ejecutar pruebas (si tienes pruebas, de lo contrario puedes saltar este paso)
     - name: Run tests
       run: |
-        pytest  # Cambia esto si usas otro marco de pruebas o si no tienes pruebas
+        pytest  # Ejecuta los tests (asegúrate de que pytest esté instalado en tu requirements.txt)
 
-    # Paso 5: Ejecutar el servidor FastAPI para pruebas
-    - name: Run FastAPI server locally
-      run: |
-        nohup uvicorn app.main:app --host 0.0.0.0 --port 8080 &  # Ejecuta el servidor en segundo plano
-
-    # Paso 6: Publicar artefactos para despliegue
     - name: Publish artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: fastapi-artifacts
-        path: .  # Publica el directorio actual como artefacto
-
-    # Aquí puedes agregar pasos adicionales si deseas realizar un despliegue
+      uses: actions/upload-artifact@v3  # 
