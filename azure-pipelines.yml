@@ -1,25 +1,28 @@
 trigger:
-- main  # This ensures the pipeline runs only when changes are pushed to the 'main' branch.
+- main  
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: default
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.10'  # Choose the appropriate Python version
-    addToPath: true
+stages:
+  - stage: buildV
+    jobs:
+      - job: UsePython
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.10'
 
-- script: |
-    pip install -r requirements.txt  # Install dependencies from requirements.txt
-  displayName: 'Install Dependencies'
+  - stage: build
+    jobs:
+      - job: build
+        steps:
+          # Install Dependencies with Admin Privileges
+          - script: |
+              powershell Start-Process npm -ArgumentList 'install' -Verb runAs
+            displayName: 'Install Dependencies with Admin Privileges'
 
-- script: |
-    uvicorn main:app --host 0.0.0.0 --port 8080  # Replace 'main' with your FastAPI app file
-  displayName: 'Run FastAPI locally (for testing)'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-  displayName: 'Publish Artifacts'
+          # Build Application
+          - script: |
+              npm run build --prefix C:\agents2\vsts-agent-win-x64-4.248.0\app
+            displayName: 'Build Application'
