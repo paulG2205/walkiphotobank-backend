@@ -26,12 +26,6 @@ stages:
       - job: build
         displayName: "Build and Install Dependencies"
         steps:
-          # Verifica que npm está disponible
-          - script: |
-              echo Checking npm version...
-              npm --version
-            displayName: 'Verify npm Installation'
-
           # Install Dependencies with Admin Privileges
           - script: |
               powershell Start-Process npm -ArgumentList 'install' -Verb runAs
