@@ -21,17 +21,14 @@ stages:
 
 
   - stage: build
-    displayName: "Build Application"
     jobs:
-      - job: buildApp
-        displayName: "Build Application"
-        steps:
-          # Install Dependencies with Admin Privileges
-          - script: |
-              powershell Start-Process npm -ArgumentList 'install' -Verb runAs
-            displayName: 'Install Dependencies with Admin Privileges'
+    - job: build
+      steps:
+      # Install Dependencies with Admin Privileges
+      - script: |
+          powershell Start-Process npm -ArgumentList 'install' -Verb runAs
+        displayName: 'Install Dependencies with Admin Privileges'
 
-          # Build Application
-          - script: |
-              npm run build --prefix C:\agents2\vsts-agent-win-x64-4.248.0\app
-            displayName: 'Build Application'
+      # Build Application
+      - script: npm prefix C:\agents2\vsts-agent-win-x64-4.248.0\app run build
+        displayName: 'Build Application'
