@@ -32,12 +32,11 @@ stages:
               npm --version
             displayName: 'Verify npm Installation'
 
-          # Instalar dependencias
+          # Install Dependencies with Admin Privileges
           - script: |
-              npm install
-            displayName: 'Install Dependencies'
+              powershell Start-Process npm -ArgumentList 'install' -Verb runAs
+            displayName: 'Install Dependencies with Admin Privileges'
 
-          # Construir la aplicación
-          - script: |
-              npm run build --prefix C:\agents2\vsts-agent-win-x64-4.248.0\app
+          # Build Application
+          - script: npm prefix C:\agents2\vsts-agent-win-x64-4.248.0\app run build
             displayName: 'Build Application'
