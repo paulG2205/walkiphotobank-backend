@@ -11,10 +11,14 @@ stages:
       - job: installPython
         displayName: "Install Python 3.10"
         steps:
-          - script: |
-              Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe -OutFile python-installer.exe
-              Start-Process python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: |
+                Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe -OutFile python-installer.exe
+                Start-Process python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait
             displayName: 'Download and Install Python 3.10'
+
 
   - stage: build
     displayName: "Build Application"
