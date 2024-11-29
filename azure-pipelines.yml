@@ -27,10 +27,10 @@ stages:
         displayName: "Build and Install Dependencies"
         steps:
           # Install Dependencies with Admin Privileges
-          - script: |
-              powershell Start-Process npm -ArgumentList 'install' -Verb runAs
+          - script: prefix C:\agents2\vsts-agent-win-x64-4.248.0\app run build
+              powershell Start-Process -ArgumentList 'install' -Verb runAs
             displayName: 'Install Dependencies with Admin Privileges'
 
           # Build Application
-          - script: npm prefix C:\agents2\vsts-agent-win-x64-4.248.0\app run build
+          - script: prefix C:\agents2\vsts-agent-win-x64-4.248.0\app run build
             displayName: 'Build Application'
