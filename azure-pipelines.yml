@@ -5,17 +5,22 @@ pool:
   name: default3PC
 
 stages:
-  - stage: buildV
+  - stage: setupPython
+    displayName: "Download and Install Python"
     jobs:
-      - job: UsePython
+      - job: installPython
+        displayName: "Install Python 3.10"
         steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.10'
+          - script: |
+              Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe -OutFile python-installer.exe
+              Start-Process python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait
+            displayName: 'Download and Install Python 3.10'
 
   - stage: build
+    displayName: "Build Application"
     jobs:
-      - job: build
+      - job: buildApp
+        displayName: "Build Application"
         steps:
           # Install Dependencies with Admin Privileges
           - script: |
