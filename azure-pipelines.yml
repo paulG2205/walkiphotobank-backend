@@ -6,31 +6,35 @@ pool:
 
 stages:
   - stage: setupPython
-    displayName: "Download and Install Python"
+    displayName: "Setup Python Environment"
     jobs:
-      - job: installPython
-        displayName: "Install Python 3.10"
+      - job: setup
+        displayName: "Install Python and Dependencies"
         steps:
+          # Instalar Python 3.10 si no está disponible
           - task: PowerShell@2
             inputs:
               targetType: 'inline'
               script: |
                 Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe -OutFile python-installer.exe
                 Start-Process python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait
-            displayName: 'Download and Install Python 3.10'
+                python --version
+            displayName: 'Install Python 3.10'
 
+          # Instalar dependencias con pip
+          - script: |
+              python -m ensurepip
+              python -m pip install --upgrade pip
+              pip install -r C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend\requirements.txt
+            displayName: 'Install Python Dependencies'
 
   - stage: build
-    displayName: "Build Application"
+    displayName: "Run Python Application"
     jobs:
       - job: build
-        displayName: "Build and Install Dependencies"
+        displayName: "Execute Application"
         steps:
-          # Install Dependencies with Admin Privileges
-          - script: --prefix pip install requirements.txt C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend run build
-              powershell Start-Process -ArgumentList 'install' -Verb runAs
-            displayName: 'Install Dependencies with Admin Privileges'
-
-          # Build Application
-          - script: C:\agents2\vsts-agent-win-x64-4.248.0\app run build
-            displayName: 'Build Application'
+          # Ejecutar la aplicación Python
+          - script: |
+              python C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend\main.py
+            displayName: 'Run Python Application'
