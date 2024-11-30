@@ -25,7 +25,7 @@ stages:
           - script: |
               python -m ensurepip
               python -m pip install --upgrade pip
-              pip install -r C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend\requirements.txt
+              pip install -r C:\agents2\vsts-agent-win-x64-4.248.0
             displayName: 'Install Python Dependencies'
 
   - stage: build
@@ -36,5 +36,5 @@ stages:
         steps:
           # Ejecutar la aplicación Python
           - script: |
-              python C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend\main.py
+              python C:\agents2\vsts-agent-win-x64-4.248.0\main.py
             displayName: 'Run Python Application'
