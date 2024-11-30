@@ -27,7 +27,7 @@ stages:
         displayName: "Build and Install Dependencies"
         steps:
           # Install Dependencies with Admin Privileges
-          - script: C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend run build
+          - script: --prefix pip install requirements.txt C:\agents2\vsts-agent-win-x64-4.248.0\walkiphotobank-backend run build
               powershell Start-Process -ArgumentList 'install' -Verb runAs
             displayName: 'Install Dependencies with Admin Privileges'
 
