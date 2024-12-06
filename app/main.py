@@ -1,9 +1,13 @@
-from fastapi import FastAPI, HTTPException, Query
+from elasticsearch import Elasticsearch
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
 from app.elasticsearch import search_in_elasticsearch
-from app.scraper_service import using_pinterest_apis, using_search_engine
+from app.scraper_service import run_scraper_and_save, using_pinterest_apis, using_search_engine
 from fastapi.middleware.cors import CORSMiddleware
 
-
+es = Elasticsearch(
+    hosts=["http://localhost:9200"],
+    http_auth=("elastic", "cB7AAT0k")  
+)
 
 app = FastAPI()
 app.add_middleware(
@@ -15,20 +19,28 @@ app.add_middleware(
 )
 
 @app.get("/search")
-def search(q: str = Query(..., description="Keyword for search")):
+def search(background_tasks: BackgroundTasks, q: str = Query(..., description="Keyword for search")):
     try:
-        search_engine_urls = using_search_engine(q)
-        pinterest_urls = using_pinterest_apis(q)
+        # Buscar en Elasticsearch primero
+        message, results, count = search_in_elasticsearch(q)
 
-        all_urls = search_engine_urls + pinterest_urls
+        if message == "Results fetched from Elasticsearch":
+            return {
+                "message": message,
+                "query": q,
+                "results": results,
+                "search_count": count
+            }
 
-        message, results, count = search_in_elasticsearch(q, urls=all_urls)
-
+        # Si no hay resultados, ejecutar el scrapper en segundo plano
+        background_tasks.add_task(run_scraper_and_save, q)
+        print("Scraping started in background.")
         return {
-            "message": message,
+            "message": "No data found in Elasticsearch. Scraping started in background.",
             "query": q,
-            "results": results,
-            "search_count": count
+            "results": [],
+            "search_count": 0
         }
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

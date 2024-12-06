@@ -1,5 +1,6 @@
 import os
 import shutil
+from elasticsearch import Elasticsearch
 from pinscrape import scraper, Pinterest
 import requests
 from bs4 import BeautifulSoup
@@ -8,6 +9,11 @@ from bs4 import BeautifulSoup
 proxies = {}
 number_of_workers = 10
 images_to_download = 4
+
+es = Elasticsearch(
+    hosts=["http://localhost:9200"],
+    http_auth=("elastic", "cB7AAT0k")  
+)
 
 def using_search_engine(keyword: str):
     """
@@ -73,3 +79,41 @@ def using_pinterest_apis(keyword: str):
         if os.path.exists(keyword):
             shutil.rmtree(keyword)
         raise RuntimeError(f"Error during Pinterest API scraping: {e}")
+    
+    
+    
+COLORS = [
+    "black", "white", "red", "blue", "green", "yellow", "purple", 
+    "pink", "orange", "gray", "brown", "teal", "cyan", "magenta", 
+    "gold", "silver", "beige", "ivory", "maroon", "navy", "olive", 
+    "lime", "coral", "peach", "violet", "turquoise", "indigo", 
+    "lavender", "charcoal", "chocolate", "tan", "amber", "emerald", 
+    "ruby", "sapphire", "rose", "aquamarine", "burgundy", "plum"
+]
+
+def run_scraper_and_save(q: str):
+    """
+    Ejecuta el scrapper y guarda los resultados en Elasticsearch.
+    Asegura que el keyword completo se almacene correctamente.
+    """
+    try:
+        # Ejecutar scrapers
+        search_engine_urls = using_search_engine(q)
+        pinterest_urls = using_pinterest_apis(q)
+        all_urls = search_engine_urls + pinterest_urls
+
+
+        index_name = "photos"
+        for url in all_urls:
+            es.index(
+                index=index_name,
+                body={
+                    "url": url,
+                    "keyword": q.lower(),  # Usar el término completo proporcionado por el usuario
+                    "source": "scraper",
+                    "timestamp": "now"
+                }
+            )
+        print(f"Scraping completed and data indexed for query: {q}")
+    except Exception as e:
+        print(f"Error in background scraper task: {e}")
