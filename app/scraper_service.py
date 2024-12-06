@@ -102,14 +102,13 @@ def run_scraper_and_save(q: str):
         pinterest_urls = using_pinterest_apis(q)
         all_urls = search_engine_urls + pinterest_urls
 
-
         index_name = "photos"
         for url in all_urls:
             es.index(
                 index=index_name,
                 body={
                     "url": url,
-                    "keyword": q.lower(),  # Usar el término completo proporcionado por el usuario
+                    "keyword": q.lower(),  # Asegura que almacene exactamente lo que se busca
                     "source": "scraper",
                     "timestamp": "now"
                 }

@@ -42,6 +42,7 @@ def search_in_elasticsearch(q: str, index_name: str = "photos"):
                     "data": hit["_source"]
                 }
                 for hit in es_results["hits"]["hits"]
+                if hit["_source"]["keyword"] == q.lower()  # Asegurarse de que coincide exactamente
             ]
             return "Results fetched from Elasticsearch", results, len(results)
 

@@ -24,7 +24,7 @@ def search(background_tasks: BackgroundTasks, q: str = Query(..., description="K
         # Buscar en Elasticsearch primero
         message, results, count = search_in_elasticsearch(q)
 
-        if message == "Results fetched from Elasticsearch":
+        if message == "Results fetched from Elasticsearch" and results:
             return {
                 "message": message,
                 "query": q,
@@ -32,9 +32,9 @@ def search(background_tasks: BackgroundTasks, q: str = Query(..., description="K
                 "search_count": count
             }
 
-        # Si no hay resultados, ejecutar el scrapper en segundo plano
+        print(f"No data found in Elasticsearch for query: {q}. Starting scraper...")
         background_tasks.add_task(run_scraper_and_save, q)
-        print("Scraping started in background.")
+
         return {
             "message": "No data found in Elasticsearch. Scraping started in background.",
             "query": q,
